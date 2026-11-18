@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Preparar entorno (se ejecuta solo al abrir el proyecto)",
+      "type": "shell",
+      "command": "python3",
+      "args": ["scripts/bootstrap.py", "--quiet"],
+      "windows": { "command": "py", "args": ["-3", "scripts/bootstrap.py", "--quiet"] },
+      "runOptions": { "runOn": "folderOpen" },
+      "presentation": { "reveal": "silent", "panel": "dedicated", "close": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Abrir la app",
+      "type": "shell",
+      "command": "python dev.py run",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Revisar todo (estilo + pruebas)",
+      "type": "shell",
+      "command": "python dev.py check",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}
