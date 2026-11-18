@@ -1,0 +1,51 @@
+# ============================================================================================
+#  Marco común de todos los paneles: fondo, barra superior y área de contenido.
+#  Lo que escribas en el .kv de TU panel se coloca dentro de `content` (debajo de la barra).
+# ============================================================================================
+#:import theme hub.theme
+#:import gfx hub.gfx
+#:import dp kivy.metrics.dp
+#:import safe_insets hub.device.safe_insets
+
+<PanelFrame>:
+    inset_top: safe_insets()[0]
+    inset_bottom: safe_insets()[1]
+    content: content_box
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            texture: gfx.gradient(theme.BG_TOP, theme.BG, "v")
+        # Una luz suave del color del panel, arriba a la derecha
+        Color:
+            rgba: theme.with_alpha(self.accent, 0.30)
+        Rectangle:
+            texture: gfx.glow()
+            size: max(self.width, self.height) * 0.9, max(self.width, self.height) * 0.9
+            pos: self.right - max(self.width, self.height) * 0.62, self.top - max(self.width, self.height) * 0.62
+    BoxLayout:
+        orientation: "vertical"
+        padding: 0, root.inset_top, 0, root.inset_bottom
+        TopBar:
+            title: root.title
+            accent: root.accent
+            height: dp(60) if root.show_bar else 0
+            opacity: 1 if root.show_bar else 0
+            disabled: not root.show_bar
+        FloatLayout:
+            id: content_box
+    # Botón «<» flotante para los paneles de pantalla completa (header=False)
+    BackButton:
+        x: dp(14)
+        top: root.height - root.inset_top - dp(10)
+        opacity: 0 if root.show_bar else 1
+        disabled: root.show_bar
+        on_release: app.back()
+
+<PanelScreen>:
+    PanelFrame:
+        title: root.title
+        accent: root.accent
+        show_bar: root.show_bar

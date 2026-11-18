@@ -1,0 +1,6 @@
+# Dependencias de la app: lo que se instala en tu PC Y lo que se empaqueta en el móvil.
+#
+# Kivy 2.3.1 funciona con Python 3.8 a 3.13. NO funciona con Python 3.14.
+# Si agregas una librería nueva aquí, agrégala también en `requirements = ...` de
+# buildozer.spec (hay una prueba que te avisa si se te olvida). Ver docs/GUIA_ALUMNO.md.
+kivy==2.3.1

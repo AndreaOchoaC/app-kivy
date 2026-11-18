@@ -1,0 +1,141 @@
+# ============================================================================================
+#  Pantalla de inicio (portada) y tarjetas de los paneles.
+# ============================================================================================
+#:import theme hub.theme
+#:import gfx hub.gfx
+#:import dp kivy.metrics.dp
+
+<PanelCard>:
+    orientation: "horizontal"
+    size_hint_y: None
+    height: dp(104)
+    padding: dp(16)
+    spacing: dp(16)
+    bg: theme.SURFACE if self.ok else theme.mix(theme.SURFACE, theme.DANGER, 0.12)
+    on_release: app.open_panel(self.panel_id) if self.ok else app.toast(self.subtitle)
+    canvas.before:
+        # Un velo de color del panel, de izquierda a derecha, sobre el fondo de la tarjeta
+        Color:
+            rgba: 1, 1, 1, 1
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(self.radius)]
+            texture: gfx.gradient(theme.with_alpha(self.accent, 0.30), theme.with_alpha(self.accent, 0.03), "h")
+    Avatar:
+        text: root.initial
+        accent: root.accent
+        accent2: root.accent2
+        pos_hint: {"center_y": 0.5}
+    BoxLayout:
+        orientation: "vertical"
+        spacing: dp(3)
+        Widget:
+        Title:
+            text: root.title
+            shorten: True
+            shorten_from: "right"
+            text_size: self.width, None
+        Caption:
+            text: root.subtitle
+            font_size: "13sp"
+            color: theme.TEXT_2 if root.ok else theme.DANGER
+            max_lines: 2
+            text_size: self.width, self.font_size * 2.6
+            height: self.font_size * 2.6
+        Widget:
+    Widget:
+        size_hint_x: None
+        width: dp(18)
+        canvas:
+            Color:
+                rgba: 1, 1, 1, 0.38 if root.ok else 0
+            Line:
+                points: self.center_x - dp(3), self.center_y + dp(8), self.center_x + dp(4), self.center_y, self.center_x - dp(3), self.center_y - dp(8)
+                width: dp(1.8)
+                cap: "round"
+                joint: "round"
+
+<HomeScreen>:
+    Aurora:
+    ScrollView:
+        id: scroll
+        do_scroll_x: False
+        bar_width: 0
+        scroll_type: ["content"]
+        BoxLayout:
+            id: stack
+            orientation: "vertical"
+            size_hint_y: None
+            height: self.minimum_height
+            padding: max(dp(22), (root.width - dp(640)) / 2), root.inset_top + dp(34), max(dp(22), (root.width - dp(640)) / 2), root.inset_bottom + dp(36)
+            spacing: dp(12)
+
+            # ---- Portada -------------------------------------------------------------
+            Chip:
+                text: "PROYECTO FINAL  ·  PYTHON"
+                tint: theme.ACCENT
+            Widget:
+                size_hint_y: None
+                height: dp(6)
+            Caption:
+                text: root.greeting + ", equipo"
+                font_size: "15sp"
+            Label:
+                text: root.app_name
+                font_size: "44sp"
+                bold: True
+                color: theme.TEXT
+                size_hint_y: None
+                text_size: self.width, None
+                height: self.texture_size[1] + dp(2)
+                halign: "left"
+                valign: "top"
+                shorten: False
+            Body:
+                text: root.tagline
+                font_size: "16sp"
+                color: theme.MUTED
+            BoxLayout:
+                size_hint_y: None
+                height: dp(26)
+                spacing: dp(8)
+                Chip:
+                    text: root.count_text
+                    tint: theme.SUCCESS
+                Chip:
+                    text: "KIVY"
+                    tint: theme.ACCENT_2
+                Widget:
+
+            Widget:
+                size_hint_y: None
+                height: dp(18)
+
+            # ---- Paneles ---------------------------------------------------------------
+            Caption:
+                text: "PANELES DEL EQUIPO"
+                bold: True
+                font_size: "12sp"
+                color: theme.FAINT
+            GridLayout:
+                id: grid
+                cols: max(1, int(self.width / dp(300)))
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: dp(14)
+
+            # ---- Pie -----------------------------------------------------------------------
+            Widget:
+                size_hint_y: None
+                height: dp(14)
+            Caption:
+                text: root.credits
+                halign: "center"
+                font_size: "13sp"
+                color: theme.MUTED
+            Caption:
+                text: root.version_text
+                halign: "center"
+                font_size: "11sp"
+                color: theme.FAINT

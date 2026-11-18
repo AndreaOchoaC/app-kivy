@@ -1,0 +1,10 @@
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = [".buildozer", "bin", "ios-toolchain", ".venv"]
+
+[tool.ruff.lint]
+# E/F: errores comunes y variables o imports sin usar. W: espacios sobrantes.
+select = ["E", "F", "W"]
+# Una línea larga no es un error: no queremos que el CI de un alumno falle por eso.
+ignore = ["E501"]

@@ -1,0 +1,10 @@
+# Finales de línea consistentes entre Windows, Mac y Linux.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.png binary
+*.jpg binary
+*.ttf binary
+*.otf binary
+*.wav binary
+*.ogg binary
+*.mp3 binary

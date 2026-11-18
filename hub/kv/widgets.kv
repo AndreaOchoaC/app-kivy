@@ -1,0 +1,325 @@
+# ============================================================================================
+#  Aspecto de los widgets de hub/widgets.py, escrito en lenguaje KV.
+#  KV separa «cómo se ve» (aquí) de «qué hace» (Python). Cada bloque <Nombre>: es una regla
+#  que se aplica a TODOS los widgets de esa clase. Las líneas se actualizan solas cuando
+#  cambia la propiedad de la que dependen (por ejemplo, self.width).
+# ============================================================================================
+#:import theme hub.theme
+#:import gfx hub.gfx
+#:import dp kivy.metrics.dp
+#:import math math
+
+# ------------------------------------------------------------------------------- textos
+<Heading>:
+    font_size: "30sp"
+    bold: True
+    color: theme.TEXT
+    size_hint_y: None
+    text_size: self.width, None
+    height: self.texture_size[1] + dp(4)
+    halign: "left"
+    valign: "top"
+
+<Title>:
+    font_size: "19sp"
+    bold: True
+    color: theme.TEXT
+    size_hint_y: None
+    text_size: self.width, None
+    height: self.texture_size[1] + dp(2)
+    halign: "left"
+    valign: "top"
+
+<Body>:
+    font_size: "15sp"
+    color: theme.TEXT_2
+    line_height: 1.18
+    size_hint_y: None
+    text_size: self.width, None
+    height: self.texture_size[1] + dp(2)
+    halign: "left"
+    valign: "top"
+
+<Caption>:
+    font_size: "12sp"
+    color: theme.MUTED
+    size_hint_y: None
+    text_size: self.width, None
+    height: self.texture_size[1] + dp(2)
+    halign: "left"
+    valign: "top"
+
+# ------------------------------------------------------------------------------- Card
+<Card>:
+    orientation: "vertical"
+    padding: dp(16)
+    spacing: dp(8)
+    canvas.before:
+        # Transformación (encoger al tocar / deslizar al entrar). Se cierra en canvas.after.
+        PushMatrix
+        Translate:
+            y: self.offset_y
+        Scale:
+            origin: self.center
+            x: self.scale
+            y: self.scale
+            z: 1
+        # Sombra suave
+        Color:
+            rgba: 0, 0, 0, 0.55
+        BorderImage:
+            texture: gfx.shadow()
+            pos: self.x - dp(19), self.y - dp(27)
+            size: self.width + dp(38), self.height + dp(38)
+            border: 36, 36, 36, 36
+            display_border: dp(29), dp(29), dp(29), dp(29)
+        # Fondo
+        Color:
+            rgba: self.bg
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(self.radius)]
+        # Borde finísimo (da el aspecto de cristal)
+        Color:
+            rgba: theme.HAIRLINE
+        Line:
+            rounded_rectangle: self.x, self.y, self.width, self.height, dp(self.radius)
+            width: dp(1)
+    canvas.after:
+        PopMatrix
+
+# ------------------------------------------------------------------------------- PillButton
+<PillButton>:
+    size_hint_y: None
+    height: dp(52)
+    font_size: "16sp"
+    bold: True
+    color: (1, 1, 1, 1) if self.kind == "primary" else theme.TEXT
+    canvas.before:
+        PushMatrix
+        Scale:
+            origin: self.center
+            x: self.scale
+            y: self.scale
+            z: 1
+        Color:
+            rgba: (1, 1, 1, 1) if self.kind == "primary" else (theme.SURFACE_HI if self.kind == "secondary" else (0, 0, 0, 0))
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [self.height / 2]
+            texture: gfx.gradient(self.accent, theme.companion(self.accent), "d") if self.kind == "primary" else None
+        Color:
+            rgba: theme.HAIRLINE if self.kind != "primary" else (1, 1, 1, 0.18)
+        Line:
+            rounded_rectangle: self.x, self.y, self.width, self.height, self.height / 2
+            width: dp(1)
+        # Capa oscura mientras se mantiene presionado
+        Color:
+            rgba: (0, 0, 0, 0.22) if self.state == "down" else (0, 0, 0, 0)
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [self.height / 2]
+    canvas.after:
+        PopMatrix
+
+# ------------------------------------------------------------------------------- Chip
+<Chip>:
+    size_hint: None, None
+    height: dp(26)
+    width: self.texture_size[0] + dp(22)
+    font_size: "11sp"
+    bold: True
+    color: theme.mix(self.tint, (1, 1, 1, 1), 0.35)
+    canvas.before:
+        Color:
+            rgba: theme.with_alpha(self.tint, 0.18)
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(13)]
+
+# ------------------------------------------------------------------------------- Avatar
+<Avatar>:
+    size_hint: None, None
+    size: dp(56), dp(56)
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Ellipse:
+            pos: self.pos
+            size: self.size
+            texture: gfx.gradient(self.accent, self.accent2, "d")
+        Color:
+            rgba: 1, 1, 1, 0.22
+        Line:
+            ellipse: self.x, self.y, self.width, self.height
+            width: dp(1)
+    Label:
+        text: root.text
+        font_size: root.height * 0.44
+        bold: True
+        color: 1, 1, 1, 1
+        size: self.texture_size
+        center: root.center
+
+# ------------------------------------------------------------------------------- Swatch
+<Swatch>:
+    size_hint: None, None
+    size: dp(42), dp(42)
+    canvas:
+        Color:
+            rgba: self.value
+        Ellipse:
+            pos: self.x + dp(5), self.y + dp(5)
+            size: self.width - dp(10), self.height - dp(10)
+        Color:
+            rgba: (1, 1, 1, 0.95) if self.selected else (1, 1, 1, 0)
+        Line:
+            circle: self.center_x, self.center_y, self.width / 2 - dp(2)
+            width: dp(1.8)
+
+# ------------------------------------------------------------------------------- Divider
+<Divider>:
+    size_hint_y: None
+    height: dp(1)
+    canvas:
+        Color:
+            rgba: theme.HAIRLINE
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+# ------------------------------------------------------------------------------- barras
+<BackButton>:
+    size_hint: None, None
+    size: dp(44), dp(44)
+    canvas:
+        Color:
+            rgba: (1, 1, 1, 0.18) if self.state == "down" else (1, 1, 1, 0.08)
+        Ellipse:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: theme.TEXT
+        Line:
+            points: self.center_x + dp(3), self.center_y + dp(8), self.center_x - dp(4), self.center_y, self.center_x + dp(3), self.center_y - dp(8)
+            width: dp(1.8)
+            cap: "round"
+            joint: "round"
+
+<TopBar>:
+    size_hint_y: None
+    height: dp(60)
+    padding: dp(14), dp(8), dp(14), dp(8)
+    spacing: dp(10)
+    BackButton:
+        on_release: app.back()
+    Label:
+        text: root.title
+        font_size: "18sp"
+        bold: True
+        color: theme.TEXT
+        halign: "center"
+        valign: "middle"
+        text_size: self.size
+    Widget:
+        size_hint_x: None
+        width: dp(44)
+
+# ------------------------------------------------------------------------------- Toast
+<Toast>:
+    size_hint: None, None
+    text_size: dp(320), None
+    halign: "center"
+    valign: "middle"
+    font_size: "14sp"
+    color: theme.TEXT
+    size: min(self.texture_size[0], dp(320)) + dp(36), self.texture_size[1] + dp(26)
+    pos_hint: {"center_x": 0.5}
+    y: dp(40)
+    opacity: 0
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 0.5
+        BorderImage:
+            texture: gfx.shadow()
+            pos: self.x - dp(19), self.y - dp(27)
+            size: self.width + dp(38), self.height + dp(38)
+            border: 36, 36, 36, 36
+            display_border: dp(29), dp(29), dp(29), dp(29)
+        Color:
+            rgba: theme.SURFACE_HI
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [min(self.height / 2, dp(22))]
+        Color:
+            rgba: theme.HAIRLINE
+        Line:
+            rounded_rectangle: self.x, self.y, self.width, self.height, min(self.height / 2, dp(22))
+            width: dp(1)
+
+# ------------------------------------------------------------------------------- ErrorSheet
+<ErrorSheet>:
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 0.74
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Card:
+        size_hint: None, None
+        width: min(root.width - dp(40), dp(420))
+        height: self.minimum_height
+        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+        padding: dp(22)
+        spacing: dp(12)
+        Chip:
+            text: "ERROR"
+            tint: theme.DANGER
+        Title:
+            text: root.title
+        Body:
+            text: root.message
+        Caption:
+            text: root.where
+        BoxLayout:
+            id: buttons
+            orientation: "vertical"
+            size_hint_y: None
+            height: self.minimum_height
+            spacing: dp(10)
+
+# ------------------------------------------------------------------------------- Aurora
+# Fondo de la pantalla de inicio. `phase` va de 0 a 1 y vuelve (ver Aurora en widgets.py);
+# con él movemos tres luces de colores. `e` = (1 - cos(pi*t)) / 2 hace el movimiento suave:
+# va de 0 a 1 sin sacudidas al cambiar de sentido.
+<Aurora>:
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            texture: gfx.gradient(theme.BG_TOP, theme.BG, "v")
+        Color:
+            rgba: theme.with_alpha(theme.AURORA[0], 0.50)
+        Rectangle:
+            texture: gfx.glow()
+            size: max(self.width, self.height) * 0.95, max(self.width, self.height) * 0.95
+            pos: self.x + self.width * (0.10 + 0.45 * (1 - math.cos(math.pi * self.phase)) / 2) - max(self.width, self.height) * 0.475, self.y + self.height * (0.92 - 0.12 * (1 - math.cos(math.pi * self.phase)) / 2) - max(self.width, self.height) * 0.475
+        Color:
+            rgba: theme.with_alpha(theme.AURORA[1], 0.34)
+        Rectangle:
+            texture: gfx.glow()
+            size: max(self.width, self.height) * 0.80, max(self.width, self.height) * 0.80
+            pos: self.x + self.width * (0.95 - 0.55 * (1 - math.cos(math.pi * self.phase)) / 2) - max(self.width, self.height) * 0.40, self.y + self.height * (0.55 + 0.18 * (1 - math.cos(math.pi * self.phase)) / 2) - max(self.width, self.height) * 0.40
+        Color:
+            rgba: theme.with_alpha(theme.AURORA[2], 0.26)
+        Rectangle:
+            texture: gfx.glow()
+            size: max(self.width, self.height) * 0.85, max(self.width, self.height) * 0.85
+            pos: self.x + self.width * (0.15 + 0.5 * (1 - (1 - math.cos(math.pi * self.phase)) / 2)) - max(self.width, self.height) * 0.425, self.y + self.height * (0.10 + 0.22 * (1 - math.cos(math.pi * self.phase)) / 2) - max(self.width, self.height) * 0.425
