@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 470" width="920" height="470" role="img" aria-label="Cómo está hecha la app: main.py abre el núcleo hub, que descubre los paneles de cada alumno">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#14142A"/><stop offset="1" stop-color="#08080F"/>
+    </linearGradient>
+    <linearGradient id="pink" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF5E8A"/><stop offset="1" stop-color="#B0449A"/></linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2FB8FF"/><stop offset="1" stop-color="#3B6FE0"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBBF24"/><stop offset="1" stop-color="#C98A1B"/></linearGradient>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8E8EA8"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: #F5F5F7; }
+      .t  { font-size: 15px; font-weight: 700; }
+      .s  { font-size: 12.5px; fill: #B4B4C8; }
+      .h  { font-size: 12px; font-weight: 700; fill: #8E8EA8; letter-spacing: 1.5px; }
+      .box { fill: #16161F; stroke: #34344C; stroke-width: 1.2; }
+      .line { stroke: #8E8EA8; stroke-width: 1.6; fill: none; marker-end: url(#arr); }
+    </style>
+  </defs>
+
+  <rect width="920" height="470" rx="22" fill="url(#bg)"/>
+
+  <!-- Título -->
+  <text x="34" y="44" class="h">CÓMO ESTÁ HECHA LA APP</text>
+
+  <!-- main.py -->
+  <rect x="34" y="78" width="170" height="76" rx="16" class="box"/>
+  <text x="54" y="108" class="t">main.py</text>
+  <text x="54" y="130" class="s">El botón de «encender»</text>
+
+  <!-- hub -->
+  <rect x="268" y="66" width="270" height="206" rx="18" class="box" stroke="#7C6CFF"/>
+  <text x="288" y="94" class="t">hub/  (el núcleo)</text>
+  <text x="288" y="114" class="s">No se edita: ya está terminado</text>
+  <rect x="288" y="130" width="230" height="30" rx="10" fill="#202030"/><text x="302" y="150" class="s">Pantalla de inicio (portada)</text>
+  <rect x="288" y="166" width="230" height="30" rx="10" fill="#202030"/><text x="302" y="186" class="s">Widgets: Card, PillButton, Avatar…</text>
+  <rect x="288" y="202" width="230" height="30" rx="10" fill="#202030"/><text x="302" y="222" class="s">Navegación, tema y guardado</text>
+  <rect x="288" y="238" width="230" height="24" rx="10" fill="#202030"/><text x="302" y="255" class="s">Protege la app de errores</text>
+
+  <!-- panels -->
+  <rect x="602" y="66" width="284" height="344" rx="18" class="box" stroke="#34D399"/>
+  <text x="622" y="94" class="t">panels/  (¡tu zona!)</text>
+  <text x="622" y="114" class="s">Una carpeta por alumno</text>
+
+  <rect x="622" y="130" width="244" height="68" rx="14" fill="#202030"/>
+  <circle cx="654" cy="164" r="19" fill="url(#pink)"/><text x="654" y="170" text-anchor="middle" class="t">P</text>
+  <text x="684" y="158" class="t">pilar/</text><text x="684" y="178" class="s">panel.py  ·  panel.kv  ·  assets/</text>
+
+  <rect x="622" y="208" width="244" height="68" rx="14" fill="#202030"/>
+  <circle cx="654" cy="242" r="19" fill="url(#blue)"/><text x="654" y="248" text-anchor="middle" class="t">E</text>
+  <text x="684" y="236" class="t">emiliano/</text><text x="684" y="256" class="s">panel.py  ·  panel.kv  ·  assets/</text>
+
+  <rect x="622" y="286" width="244" height="68" rx="14" fill="#202030"/>
+  <circle cx="654" cy="320" r="19" fill="url(#gold)"/><text x="654" y="326" text-anchor="middle" class="t">J</text>
+  <text x="684" y="314" class="t">jorge/</text><text x="684" y="334" class="s">panel.py  ·  panel.kv  ·  assets/</text>
+
+  <rect x="622" y="364" width="244" height="34" rx="12" fill="none" stroke="#34344C" stroke-dasharray="5 4"/>
+  <text x="640" y="386" class="s">_template/  (modelo para crear más)</text>
+
+  <!-- flechas -->
+  <path d="M204,116 L262,116" class="line"/>
+  <text x="212" y="104" class="s">abre</text>
+  <path d="M538,116 L596,116" class="line"/>
+  <text x="540" y="104" class="s">descubre</text>
+
+  <!-- celular -->
+  <rect x="34" y="214" width="170" height="196" rx="22" class="box"/>
+  <rect x="48" y="228" width="142" height="168" rx="14" fill="#0D0D18"/>
+  <text x="119" y="252" text-anchor="middle" class="s">Lo que ve el usuario</text>
+  <rect x="58" y="266" width="122" height="30" rx="9" fill="#2A1C30"/><circle cx="73" cy="281" r="8" fill="url(#pink)"/><text x="88" y="285" class="s" style="font-size:11px">Panel de Pilar</text>
+  <rect x="58" y="302" width="122" height="30" rx="9" fill="#10243A"/><circle cx="73" cy="317" r="8" fill="url(#blue)"/><text x="88" y="321" class="s" style="font-size:11px">Panel de Emiliano</text>
+  <rect x="58" y="338" width="122" height="30" rx="9" fill="#33290F"/><circle cx="73" cy="353" r="8" fill="url(#gold)"/><text x="88" y="357" class="s" style="font-size:11px">Panel de Jorge</text>
+  <path d="M119,214 L119,160" class="line" style="stroke-dasharray:4 4"/>
+
+  <!-- plataformas -->
+  <text x="268" y="312" class="h">SE EMPAQUETA PARA</text>
+  <rect x="268" y="326" width="84" height="84" rx="14" class="box"/><text x="310" y="364" text-anchor="middle" class="t">PC</text><text x="310" y="384" text-anchor="middle" class="s">Python</text>
+  <rect x="362" y="326" width="84" height="84" rx="14" class="box"/><text x="404" y="364" text-anchor="middle" class="t">Android</text><text x="404" y="384" text-anchor="middle" class="s">.apk</text>
+  <rect x="456" y="326" width="82" height="84" rx="14" class="box"/><text x="497" y="364" text-anchor="middle" class="t">iPhone</text><text x="497" y="384" text-anchor="middle" class="s">.ipa</text>
+  <path d="M497,272 L497,320" class="line" style="stroke-dasharray:4 4"/>
+
+  <text x="34" y="446" class="s">Lo único que cambia entre alumnos es la carpeta de panels/. Todo lo demás es compartido.</text>
+</svg>
