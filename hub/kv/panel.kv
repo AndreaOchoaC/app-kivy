@@ -37,11 +37,13 @@
         FloatLayout:
             id: content_box
     # Botón «<» flotante para los paneles de pantalla completa (header=False)
+    # (Con barra superior, este botón mide 0 x 0: un widget «disabled» seguiría tragándose los
+    # toques encima del botón real, por eso se anula su tamaño en vez de desactivarlo.)
     BackButton:
         x: dp(14)
         top: root.height - root.inset_top - dp(10)
+        size: (0, 0) if root.show_bar else (dp(44), dp(44))
         opacity: 0 if root.show_bar else 1
-        disabled: root.show_bar
         on_release: app.back()
 
 <PanelScreen>:
