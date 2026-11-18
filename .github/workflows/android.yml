@@ -1,0 +1,106 @@
+name: Build Android (APK)
+
+# ============================================================================================
+#  Compila un APK en CADA push, de CUALQUIER rama. Cada rama tiene su propio APK:
+#
+#     push a main          ->  release «build-main»          con  app-kivy-android-main.apk
+#     push a panel/pilar   ->  release «build-panel-pilar»   con  app-kivy-android-panel-pilar.apk
+#
+#  Los APK se publican en la pestaña «Releases» del repositorio (se pueden descargar sin
+#  iniciar sesión) y también quedan como «artifact» dentro de la ejecución de Actions.
+#  La primera vez tarda ~25-40 minutos (descarga el SDK y el NDK de Android); con la caché,
+#  las siguientes tardan bastante menos. Guía completa: docs/BUILDS.md
+# ============================================================================================
+on:
+  push:
+    branches: ["**"]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+  workflow_dispatch:       # y a mano: Actions -> Build Android -> Run workflow
+
+# Un build por rama a la vez: si subes otro commit, se cancela el anterior de esa rama.
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write          # para publicar el APK en Releases
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      # Nombre de la rama apto para archivos: «panel/Pilar» -> «panel-pilar».
+      - name: Calcular nombre de la rama
+        run: |
+          slug=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9._-]/-/g')
+          echo "SLUG=$slug" >> "$GITHUB_ENV"
+
+      # La app muestra en la portada de qué rama y commit es: así sabes qué versión instalaste.
+      - name: Anotar rama y commit dentro de la app
+        run: |
+          printf 'BRANCH = "%s"\nCOMMIT = "%s"\n' "$GITHUB_REF_NAME" "$GITHUB_SHA" > hub/build_info.py
+
+      # Python del RUNNER (para ejecutar buildozer). El Python que se empaqueta en la app
+      # (3.11) lo fija p4a.branch en buildozer.spec; son cosas distintas.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Paquetes que pide la documentación de buildozer para Ubuntu 24.04, MÁS libltdl-dev y
+      # libtool-bin: sin ellos, la receta de libffi falla con «LT_SYS_SYMBOL_USCORE».
+      - name: Instalar dependencias del sistema
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip \
+            autoconf libtool libtool-bin libltdl-dev pkg-config zlib1g-dev \
+            libncurses5-dev libncursesw5-dev libtinfo6 cmake libffi-dev libssl-dev \
+            automake autopoint gettext
+
+      # Cython 0.29.x: la mayoría de recetas de python-for-android no soportan Cython 3.
+      - name: Instalar buildozer
+        run: python -m pip install buildozer setuptools cython==0.29.34
+
+      # Guarda lo descargado (SDK, NDK, dependencias compiladas) entre ejecuciones. Una rama
+      # nueva reutiliza la caché de main gracias a «restore-keys».
+      - name: Caché de buildozer
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.buildozer
+            .buildozer
+          key: buildozer-${{ runner.os }}-${{ hashFiles('buildozer.spec', 'requirements.txt') }}
+          restore-keys: |
+            buildozer-${{ runner.os }}-
+
+      # Se reintenta hasta 3 veces: buildozer descarga cosas de Internet y, de vez en cuando,
+      # una descarga se corta. Es un fallo de red, no de tu código; reintentar lo resuelve.
+      - name: Compilar APK (debug)
+        run: |
+          for intento in 1 2 3; do
+            buildozer -v android debug && exit 0
+            echo "::warning::Intento $intento de 3 fallido; reintentando..."
+          done
+          exit 1
+
+      - name: Renombrar el APK
+        run: |
+          mkdir -p dist
+          cp bin/*.apk "dist/app-kivy-android-${SLUG}.apk"
+
+      - name: Subir el APK como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk-${{ env.SLUG }}
+          path: dist/*.apk
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Publicar en Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/publish_release.sh "$SLUG" "dist/app-kivy-android-${SLUG}.apk"

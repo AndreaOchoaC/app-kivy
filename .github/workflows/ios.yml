@@ -1,0 +1,162 @@
+name: Build iOS (IPA sin firmar)
+
+# ============================================================================================
+#  Compila la app para iPhone en CADA push, de CUALQUIER rama (igual que Android):
+#
+#     push a panel/pilar   ->  release «build-panel-pilar»  con  app-kivy-ios-panel-pilar.ipa
+#
+#  Qué produce (sin certificados de Apple):
+#    * app-kivy-ios-<rama>.ipa        IPA sin firmar. Para instalarla en un iPhone real hay que
+#                                     firmarla con tu Apple ID (Sideloadly). Ver docs/BUILDS.md.
+#    * app-kivy-ios-<rama>-simulador.zip   app para el Simulador de iOS (solo en un Mac con Xcode).
+#
+#  Los runners de macOS son lentos: la primera vez tarda ~40 minutos; con la caché, ~15.
+#  En repositorios PÚBLICOS los minutos de macOS son gratis. Si el repo se vuelve privado,
+#  cada minuto de macOS cuenta x10 contra la cuota gratuita: en ese caso cambia `branches`
+#  de abajo a [main] para compilar iOS solo en main.
+# ============================================================================================
+on:
+  push:
+    branches: ["**"]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  ios:
+    runs-on: macos-14
+    timeout-minutes: 120
+    env:
+      APP_TITLE: TimeClubStudio
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Calcular nombre de la rama
+        run: |
+          slug=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9._-]/-/g')
+          echo "SLUG=$slug" >> "$GITHUB_ENV"
+
+      - name: Anotar rama y commit dentro de la app
+        run: |
+          printf 'BRANCH = "%s"\nCOMMIT = "%s"\n' "$GITHUB_REF_NAME" "$GITHUB_SHA" > hub/build_info.py
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Herramientas que pide el README de kivy-ios.
+      - name: Instalar herramientas de compilación
+        run: |
+          brew install autoconf automake libtool pkg-config
+          brew link libtool || true
+
+      # Cython es obligatorio: kivy-ios lo usa para compilar Kivy. 3.0.11 es la última versión
+      # que soporta Kivy 2.3.1.
+      - name: Instalar kivy-ios
+        run: python -m pip install kivy-ios "cython==3.0.11" setuptools
+
+      # Las librerías que se compilan salen de la línea `requirements` de buildozer.spec,
+      # así Android e iOS usan SIEMPRE la misma lista. («python3,kivy» -> «python3 kivy»)
+      - name: Leer las librerías de buildozer.spec
+        run: |
+          recipes=$(grep -E '^requirements' buildozer.spec | head -1 | cut -d= -f2 | tr ',' ' ' | xargs)
+          echo "RECIPES=$recipes" >> "$GITHUB_ENV"
+          echo "Recetas de kivy-ios: $recipes"
+
+      - name: Crear carpeta de trabajo de la toolchain
+        run: mkdir -p ios-toolchain
+
+      # kivy-ios compila Python y Kivy para iOS DENTRO de la carpeta donde se ejecuta
+      # (crea build/ y dist/). Es lo más lento, por eso se guarda en caché.
+      - name: Caché de la toolchain de kivy-ios
+        id: toolchain-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ios-toolchain/build
+            ios-toolchain/dist
+          key: kivy-ios-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            kivy-ios-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Compilar Python y Kivy para iOS (dispositivo + simulador)
+        working-directory: ios-toolchain
+        run: toolchain build $RECIPES
+
+      # Se guarda AQUÍ (y no al final) para que, si un paso posterior falla, el reintento no
+      # tenga que recompilar Python y Kivy (~18 min).
+      - name: Guardar caché de la toolchain
+        if: steps.toolchain-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ios-toolchain/build
+            ios-toolchain/dist
+          key: kivy-ios-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('requirements.txt') }}
+
+      - name: Preparar carpeta de la app
+        run: |
+          mkdir -p ios-toolchain/app
+          rsync -a \
+            --exclude '.git' --exclude '.github' --exclude '.vscode' --exclude 'tests' \
+            --exclude 'docs' --exclude 'scripts' --exclude 'ios-toolchain' --exclude '.buildozer' \
+            --exclude 'bin' --exclude 'dist' --exclude '.venv' --exclude 'panels/_template' \
+            --exclude 'dev.py' --exclude 'setup.*' --exclude 'requirements-dev.txt' \
+            --exclude 'pytest.ini' --exclude 'pyproject.toml' \
+            ./ ios-toolchain/app/
+
+      - name: Crear el proyecto de Xcode
+        working-directory: ios-toolchain
+        run: toolchain create "$APP_TITLE" "$PWD/app"
+
+      - name: Compilar para el simulador
+        working-directory: ios-toolchain
+        run: |
+          PROJ=$(find . -maxdepth 2 -name '*.xcodeproj' | head -1)
+          SCHEME=$(basename "$PROJ" .xcodeproj)
+          echo "Proyecto: $PROJ  Esquema: $SCHEME"
+          xcodebuild -project "$PROJ" -scheme "$SCHEME" -configuration Debug \
+            -sdk iphonesimulator -derivedDataPath build/xcode-sim \
+            ARCHS=arm64 ONLY_ACTIVE_ARCH=NO EXCLUDED_ARCHS=x86_64 \
+            CODE_SIGNING_ALLOWED=NO build
+
+      - name: Compilar para iPhone (sin firmar) y empaquetar .ipa
+        working-directory: ios-toolchain
+        run: |
+          PROJ=$(find . -maxdepth 2 -name '*.xcodeproj' | head -1)
+          SCHEME=$(basename "$PROJ" .xcodeproj)
+          xcodebuild -project "$PROJ" -scheme "$SCHEME" -configuration Release \
+            -sdk iphoneos -derivedDataPath build/xcode-device \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
+          APP=$(find build/xcode-device/Build/Products -maxdepth 2 -name '*.app' | head -1)
+          mkdir -p out/Payload
+          cp -R "$APP" out/Payload/
+          (cd out && zip -qr "app-kivy-ios-${SLUG}.ipa" Payload)
+          SIM=$(find build/xcode-sim/Build/Products -maxdepth 2 -name '*.app' | head -1)
+          ditto -c -k --sequesterRsrc --keepParent "$SIM" "out/app-kivy-ios-${SLUG}-simulador.zip"
+
+      - name: Subir resultados como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa-${{ env.SLUG }}
+          path: |
+            ios-toolchain/out/*.ipa
+            ios-toolchain/out/*.zip
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Publicar en Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash .github/scripts/publish_release.sh "$SLUG" \
+            "ios-toolchain/out/app-kivy-ios-${SLUG}.ipa" \
+            "ios-toolchain/out/app-kivy-ios-${SLUG}-simulador.zip"
