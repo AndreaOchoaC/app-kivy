@@ -1,0 +1,86 @@
+#:import theme hub.theme
+#:import dp kivy.metrics.dp
+
+<VariasVentanasPanel>:
+    ScreenManager:
+        id: interior
+
+        Screen:
+            name: "menu"
+            BoxLayout:
+                orientation: "vertical"
+                padding: dp(20), dp(10)
+                spacing: dp(14)
+                Heading:
+                    text: "Menú"
+                Body:
+                    text: "Este panel tiene tres ventanas internas. Prueba el botón «<» de arriba: primero vuelve al menú."
+                PillButton:
+                    text: "Ventana A: una calculadora de edad"
+                    accent: root.accent
+                    on_release: root.ir("ventana_a")
+                PillButton:
+                    text: "Ventana B: un saludo"
+                    kind: "secondary"
+                    on_release: root.ir("ventana_b")
+                Widget:
+
+        Screen:
+            name: "ventana_a"
+            BoxLayout:
+                orientation: "vertical"
+                padding: dp(20), dp(10)
+                spacing: dp(14)
+                Heading:
+                    text: "Ventana A"
+                Body:
+                    text: "Escribe tu año de nacimiento:"
+                TextInput:
+                    id: anio
+                    hint_text: "2012"
+                    input_filter: "int"
+                    multiline: False
+                    size_hint_y: None
+                    height: dp(52)
+                    font_size: "18sp"
+                    padding: dp(16), dp(14)
+                    foreground_color: theme.TEXT
+                    hint_text_color: theme.FAINT
+                    background_normal: ""
+                    background_active: ""
+                    background_color: theme.SURFACE_HI
+                    cursor_color: root.accent
+                Label:
+                    id: resultado
+                    text: ""
+                    font_size: "22sp"
+                    bold: True
+                    color: theme.TEXT
+                    size_hint_y: None
+                    height: dp(60)
+                PillButton:
+                    text: "Calcular mi edad"
+                    accent: root.accent
+                    on_release: resultado.text = ("Tienes " + str(2026 - int(anio.text)) + " años") if anio.text else "Escribe un año"
+                Widget:
+
+        Screen:
+            name: "ventana_b"
+            BoxLayout:
+                orientation: "vertical"
+                padding: dp(20), dp(10)
+                spacing: dp(14)
+                Heading:
+                    text: "Ventana B"
+                Card:
+                    size_hint_y: None
+                    height: self.minimum_height
+                    Title:
+                        text: "¡Hola!"
+                    Body:
+                        text: "Aquí puedes poner lo que quieras: un juego, un formulario, un dibujo..."
+                PillButton:
+                    text: "Volver al menú"
+                    kind: "secondary"
+                    on_release: root.ir("menu")
+                Widget:

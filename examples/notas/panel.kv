@@ -1,0 +1,66 @@
+#:import theme hub.theme
+#:import dp kivy.metrics.dp
+
+# El aspecto de una fila de la lista. La clase NotaFila está en panel.py (con sus propiedades).
+<NotaFila>:
+    orientation: "horizontal"
+    size_hint_y: None
+    height: dp(64)
+    padding: dp(16), dp(8)
+    Body:
+        text: root.texto
+        size_hint_y: 1
+        valign: "middle"
+        text_size: self.width, self.height
+    PillButton:
+        text: "Borrar"
+        kind: "secondary"
+        size_hint: None, None
+        size: dp(84), dp(40)
+        pos_hint: {"center_y": 0.5}
+        font_size: "13sp"
+        on_release: root.al_borrar(root.indice) if root.al_borrar else None
+
+<NotasPanel>:
+    BoxLayout:
+        orientation: "vertical"
+        padding: dp(20), dp(8), dp(20), dp(16)
+        spacing: dp(14)
+
+        Heading:
+            text: "Mis notas"
+        BoxLayout:
+            size_hint_y: None
+            height: dp(52)
+            spacing: dp(10)
+            TextInput:
+                id: entrada
+                hint_text: "Escribe una idea..."
+                multiline: False
+                font_size: "16sp"
+                padding: dp(16), dp(15)
+                foreground_color: theme.TEXT
+                hint_text_color: theme.FAINT
+                cursor_color: root.accent
+                background_normal: ""
+                background_active: ""
+                background_color: theme.SURFACE_HI
+                on_text_validate: root.agregar()
+            PillButton:
+                text: "Añadir"
+                accent: root.accent
+                size_hint_x: None
+                width: dp(100)
+                on_release: root.agregar()
+        Caption:
+            text: str(len(root.notas)) + " nota(s)"
+        ScrollView:
+            do_scroll_x: False
+            bar_width: 0
+            BoxLayout:
+                id: lista
+                orientation: "vertical"
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: dp(12)
+                padding: 0, 0, 0, dp(20)

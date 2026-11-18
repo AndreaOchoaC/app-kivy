@@ -1,0 +1,68 @@
+#:import theme hub.theme
+#:import dp kivy.metrics.dp
+
+<JuegoEstrellaPanel>:
+    FloatLayout:
+        id: arena
+
+        # La estrella: un círculo amarillo con un aro más claro.
+        Widget:
+            id: star
+            size_hint: None, None
+            size: dp(76), dp(76)
+            pos: arena.center_x - self.width / 2, arena.center_y - self.height / 2
+            opacity: 1 if root.playing else 0.25
+            canvas:
+                Color:
+                    rgba: root.accent
+                Ellipse:
+                    pos: self.pos
+                    size: self.size
+                Color:
+                    rgba: 1, 1, 1, 0.55
+                Line:
+                    circle: self.center_x, self.center_y, self.width / 2 - dp(2)
+                    width: dp(2)
+
+        # Marcador (a la derecha del botón «<» flotante)
+        BoxLayout:
+            size_hint: None, None
+            size: arena.width - dp(76), dp(56)
+            pos: arena.x + dp(66), arena.top - dp(66)
+            spacing: dp(10)
+            Label:
+                text: "Puntos  " + str(root.score)
+                font_size: "20sp"
+                bold: True
+                color: theme.TEXT
+                halign: "left"
+                text_size: self.size
+                valign: "middle"
+            Label:
+                text: "Tiempo  " + str(int(root.time_left + 0.99))
+                font_size: "20sp"
+                bold: True
+                color: theme.WARNING if root.time_left < 6 and root.playing else theme.TEXT_2
+                halign: "right"
+                text_size: self.size
+                valign: "middle"
+
+        # Panel de inicio / fin (se oculta mientras juegas)
+        Card:
+            size_hint: None, None
+            size: min(arena.width - dp(48), dp(340)), self.minimum_height
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            opacity: 0 if root.playing else 1
+            disabled: root.playing
+            padding: dp(22)
+            spacing: dp(12)
+            Title:
+                text: "Atrapa la estrella"
+            Body:
+                text: "Toca la estrella tantas veces como puedas en 20 segundos. ¡Cada toque la hace más rápida!"
+            Caption:
+                text: "Mejor puntuación: " + str(int(root.best))
+            PillButton:
+                text: "Empezar" if root.score == 0 else "Jugar otra vez"
+                accent: root.accent
+                on_release: root.start()

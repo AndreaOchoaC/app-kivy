@@ -1,0 +1,93 @@
+# ============================================================================================
+#  El DISEÑO de tu panel. KV es un lenguaje muy sencillo: cada línea con «:» es una propiedad,
+#  y lo que está más adentro (con más espacios) está DENTRO del widget de arriba.
+#
+#  Widgets listos para usar (están en hub/widgets.py):
+#    Heading Title Body Caption     textos            Card      tarjeta con sombra
+#    PillButton                     botón bonito      Chip      etiqueta pequeña
+#    Avatar                         círculo con letra  Swatch   círculo de color     Divider
+#  Y todos los widgets normales de Kivy (Label, Image, Button, BoxLayout, GridLayout...).
+#  Los colores del tema están en `theme` (theme.TEXT, theme.MUTED, theme.SUCCESS...).
+#
+#  Para ver tus cambios sin cerrar la app: guarda el archivo y pulsa F5 en la ventana.
+# ============================================================================================
+#:import theme hub.theme
+#:import dp kivy.metrics.dp
+
+<EmilianoPanel>:
+    ScrollView:
+        do_scroll_x: False
+        bar_width: 0
+        BoxLayout:
+            orientation: "vertical"
+            size_hint_y: None
+            height: self.minimum_height
+            padding: dp(20), dp(10), dp(20), dp(32)
+            spacing: dp(16)
+
+            Heading:
+                text: "Hola, soy " + root.author
+            Body:
+                text: "Este es mi panel. Todo lo que ves aquí lo puedo cambiar: textos, colores, botones... y convertirlo en mi propia app o juego."
+
+            # ---- Un contador: ejemplo de Property + botones + guardar datos -----------------
+            Card:
+                size_hint_y: None
+                height: self.minimum_height
+                Caption:
+                    text: "CONTADOR  (se acuerda aunque cierres la app)"
+                Label:
+                    text: str(int(root.count))
+                    font_size: "64sp"
+                    bold: True
+                    color: theme.TEXT
+                    size_hint_y: None
+                    height: dp(84)
+                BoxLayout:
+                    size_hint_y: None
+                    height: dp(52)
+                    spacing: dp(12)
+                    PillButton:
+                        text: "-1"
+                        kind: "secondary"
+                        on_release: root.add(-1)
+                    PillButton:
+                        text: "+1"
+                        accent: root.accent
+                        on_release: root.add(1)
+
+            # ---- Elegir color: ejemplo de cambiar una propiedad del panel -------------------
+            Card:
+                size_hint_y: None
+                height: self.minimum_height
+                Caption:
+                    text: "ELIGE EL COLOR DE TU PANEL"
+                BoxLayout:
+                    size_hint_y: None
+                    height: dp(44)
+                    spacing: dp(6)
+                    Swatch:
+                        value: theme.hx(root.palette[0])
+                        on_release: root.set_color(root.palette[0])
+                    Swatch:
+                        value: theme.hx(root.palette[1])
+                        on_release: root.set_color(root.palette[1])
+                    Swatch:
+                        value: theme.hx(root.palette[2])
+                        on_release: root.set_color(root.palette[2])
+                    Swatch:
+                        value: theme.hx(root.palette[3])
+                        on_release: root.set_color(root.palette[3])
+                    Swatch:
+                        value: theme.hx(root.palette[4])
+                        on_release: root.set_color(root.palette[4])
+                    Widget:
+
+            # ---- Tu misión -----------------------------------------------------------------
+            Card:
+                size_hint_y: None
+                height: self.minimum_height
+                Caption:
+                    text: "TU MISIÓN"
+                Body:
+                    text: "1. Abre tu carpeta en panels/ y cambia el texto de panel.kv.\n2. Cambia los colores y prueba otros widgets.\n3. Pídele a la IA una idea: un juego, una calculadora, un diario...\n4. Haz git commit y git push: tu app aparecerá en el celular."
