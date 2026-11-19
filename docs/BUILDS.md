@@ -113,15 +113,26 @@ Corre en `macos-15` (un Mac virtual con Xcode). **En repositorios públicos es g
 | Paso | Qué hace |
 |---|---|
 | `brew install autoconf automake libtool pkg-config` | Herramientas de compilación que pide kivy-ios. |
-| `pip install kivy-ios "cython==3.0.11" setuptools` | kivy-ios compila Python y Kivy para iOS. Necesita Cython. |
+| `pip install kivy-ios "cython==3.0.11" setuptools pillow` | kivy-ios compila Python y Kivy para iOS. Necesita Cython. |
 | `Leer las librerías de buildozer.spec` | Toma `requirements = python3,kivy,...` de **`buildozer.spec`** y lo convierte en la lista de recetas de kivy-ios. Así Android e iOS **usan siempre las mismas librerías**. |
 | `Caché de la toolchain` | `ios-toolchain/build` y `dist`: Python y Kivy ya compilados para iOS (lo más lento: ~18 min). Se guarda **justo después de compilar**, para que un fallo posterior no obligue a repetirlo. |
 | `toolchain build $RECIPES` | Compila Python, Kivy y tus librerías para **iPhone y simulador**. |
 | `Preparar carpeta de la app` | Copia el proyecto a `ios-toolchain/app/` sin `.git`, `tests`, `docs`, `.venv`, `panels/_template`... |
 | `toolchain create` | Genera el **proyecto de Xcode** con tu código dentro. |
+| `Ajustar nombre, id, versión, orientación e ícono` | kivy-ios crea el proyecto con valores genéricos (`org.kivy.app`, versión 1.1, sin ícono, pantalla girable). Aquí se copian de `buildozer.spec` el id (`package.domain` + `package.name`) y la versión; el nombre es «App»; se deja solo en vertical; y se genera el ícono desde `assets/icon.png`. |
 | `xcodebuild` (simulador) | Compila `Debug` para `iphonesimulator` (arm64). |
 | `xcodebuild` (iPhone) | Compila `Release` para `iphoneos` con `CODE_SIGNING_ALLOWED=NO` y **empaqueta el `.ipa` a mano** (`Payload/` + `zip`). |
-| `Publicar en Releases` | Sube `app-kivy-ios-<slug>.ipa` y `app-kivy-ios-<slug>-simulador.zip`. |
+| `Revisar el IPA` | Ejecuta `scripts/check_ipa.py`: si falta el ícono, el ejecutable no es arm64, falta tu código, etc., el build **falla** y no se publica un IPA roto. |
+| `Publicar en Releases` | Sube **solo** `app-kivy-ios-<slug>.ipa`. El zip del simulador queda como artefacto del workflow. |
+| `Probar la app en el Simulador de iPhone` | Abre la app en un iPhone virtual, espera 25 s, toma una captura y comprueba que **sigue abierta**. Va después de publicar: si falla, el workflow queda en rojo pero el IPA ya está. La captura se guarda como artefacto `captura-ios-<slug>`. |
+
+### Probar iOS sin tener un iPhone
+
+Desde Windows **no se puede ejecutar** una app de iOS (Apple solo lo permite en Mac). Lo que sí hay:
+
+1. **En tu PC:** `python scripts/check_ipa.py <archivo.ipa>` revisa el paquete que descargaste.
+2. **En GitHub:** cada build abre la app en el simulador y guarda una captura (artefacto `captura-ios-<slug>`).
+3. **En un iPhone real:** instalándola con Sideloadly (ver el README). Es la única prueba definitiva.
 
 **¿Por qué el IPA no está firmado?** Firmar requiere una cuenta de **Apple Developer** (99 USD/año) con
 certificados que no queremos guardar en un repositorio público. El `.ipa` sin firmar se instala con
@@ -167,6 +178,8 @@ Normalmente **no hace falta**: GitHub lo hace por ti. Pero si quieres:
   dependencias de `android.yml` y ejecuta `pip install buildozer cython==0.29.34` y `buildozer -v android debug`.
   El APK queda en `bin/`.
 - **iOS:** necesita un **Mac con Xcode**. Sigue los pasos de `ios.yml` a mano (`toolchain build`, `toolchain create`...).
+  Para el simulador: descarga el artefacto `ios-ipa-<slug>` del workflow, descomprime `app-kivy-ios-<slug>-simulador.zip`
+  y ejecuta `xcrun simctl install booted <ruta_al_.app>`.
 
 ---
 

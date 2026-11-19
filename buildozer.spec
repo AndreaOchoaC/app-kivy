@@ -17,7 +17,7 @@ version = 0.1.0
 # Carpeta del código y extensiones de archivo que se empaquetan en la app.
 source.dir = .
 source.include_exts = py,png,jpg,jpeg,kv,atlas,json,txt,ttf,otf,wav,ogg,mp3
-source.exclude_dirs = tests, docs, bin, scripts, .github, .git, .venv, venv, .vscode, .buildozer, ios-toolchain
+source.exclude_dirs = tests, docs, bin, scripts, .github, .git, .venv, venv, .vscode, .buildozer, ios-toolchain, examples
 source.exclude_patterns = panels/_template/*, dev.py
 
 # Python y librerías que viajan dentro de la app. Debe coincidir con requirements.txt

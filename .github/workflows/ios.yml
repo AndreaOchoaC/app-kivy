@@ -6,9 +6,13 @@ name: Build iOS (IPA sin firmar)
 #     push a panel/pilar   ->  release «build-panel-pilar»  con  app-kivy-ios-panel-pilar.ipa
 #
 #  Qué produce (sin certificados de Apple):
-#    * app-kivy-ios-<rama>.ipa        IPA sin firmar. Para instalarla en un iPhone real hay que
-#                                     firmarla con tu Apple ID (Sideloadly). Ver docs/BUILDS.md.
-#    * app-kivy-ios-<rama>-simulador.zip   app para el Simulador de iOS (solo en un Mac con Xcode).
+#    * app-kivy-ios-<rama>.ipa        IPA sin firmar. Se instala en un iPhone con Sideloadly, que la
+#                                     firma con tu Apple ID. Es lo ÚNICO que se publica en Releases.
+#    * app-kivy-ios-<rama>-simulador.zip   app para el Simulador de iOS; queda solo como artefacto
+#                                     del workflow (no en Releases) y se usa en la prueba de humo.
+#
+#  Antes de publicar se revisa el paquete (scripts/check_ipa.py) y después se abre la app en un
+#  Simulador de iPhone y se guarda una captura de pantalla (artefacto «captura-ios-<rama>»).
 #
 #  Los runners de macOS son lentos: la primera vez tarda ~40 minutos; con la caché, ~15.
 #  En repositorios PÚBLICOS los minutos de macOS son gratis. Si el repo se vuelve privado,
@@ -61,7 +65,7 @@ jobs:
       # Cython es obligatorio: kivy-ios lo usa para compilar Kivy. 3.0.11 es la última versión
       # que soporta Kivy 2.3.1.
       - name: Instalar kivy-ios
-        run: python -m pip install kivy-ios "cython==3.0.11" setuptools
+        run: python -m pip install kivy-ios "cython==3.0.11" setuptools pillow
 
       # Las librerías que se compilan salen de la línea `requirements` de buildozer.spec,
       # así Android e iOS usan SIEMPRE la misma lista. («python3,kivy» -> «python3 kivy»)
@@ -110,12 +114,46 @@ jobs:
             --exclude 'docs' --exclude 'scripts' --exclude 'ios-toolchain' --exclude '.buildozer' \
             --exclude 'bin' --exclude 'dist' --exclude '.venv' --exclude 'panels/_template' \
             --exclude 'dev.py' --exclude 'setup.*' --exclude 'requirements-dev.txt' \
-            --exclude 'pytest.ini' --exclude 'pyproject.toml' \
+            --exclude 'pytest.ini' --exclude 'pyproject.toml' --exclude 'examples'             --exclude '*.md' --exclude '.editorconfig' --exclude '.gitattributes' --exclude '.gitignore' \
             ./ ios-toolchain/app/
 
       - name: Crear el proyecto de Xcode
         working-directory: ios-toolchain
         run: toolchain create "$APP_TITLE" "$PWD/app"
+
+      # kivy-ios crea el proyecto con valores genéricos: nombre «app» en minúscula, id «org.kivy.app»,
+      # versión 1.1, sin ícono y con la pantalla girable. Aquí se dejan como en Android
+      # (buildozer.spec): mismo nombre, mismo id, misma versión, solo vertical y el mismo ícono.
+      - name: Ajustar nombre, id, versión, orientación e ícono
+        working-directory: ios-toolchain
+        run: |
+          PLIST=$(find . -maxdepth 2 -name '*-Info.plist' | head -1)
+          PROJ_DIR=$(dirname "$PLIST")
+          VERSION=$(grep -E '^version' buildozer.spec | head -1 | cut -d= -f2 | xargs)
+          PKG=$(grep -E '^package.name' buildozer.spec | head -1 | cut -d= -f2 | xargs)
+          DOMAIN=$(grep -E '^package.domain' buildozer.spec | head -1 | cut -d= -f2 | xargs)
+          PB=/usr/libexec/PlistBuddy
+          $PB -c "Set :CFBundleDisplayName $APP_TITLE" "$PLIST"
+          $PB -c "Set :CFBundleIdentifier $DOMAIN.$PKG" "$PLIST"
+          $PB -c "Set :CFBundleShortVersionString $VERSION" "$PLIST"
+          $PB -c "Set :CFBundleVersion $VERSION" "$PLIST"
+          for KEY in UISupportedInterfaceOrientations 'UISupportedInterfaceOrientations~ipad'; do
+            $PB -c "Delete :$KEY" "$PLIST"
+            $PB -c "Add :$KEY array" "$PLIST"
+            $PB -c "Add :$KEY:0 string UIInterfaceOrientationPortrait" "$PLIST"
+          done
+          # El ícono de la app (assets/icon.png) se aplana sobre el fondo oscuro (iOS no admite
+          # transparencia en íconos) y se agranda a 1024 px para que kivy-ios genere todos los tamaños.
+          python - <<'EOF'
+          from PIL import Image
+          icon = Image.open("app/assets/icon.png").convert("RGBA")
+          fondo = Image.new("RGBA", icon.size, (8, 8, 15, 255))
+          fondo.alpha_composite(icon)
+          fondo.convert("RGB").resize((1024, 1024), Image.LANCZOS).save("icon-ios.png")
+          EOF
+          toolchain icon "$PROJ_DIR" icon-ios.png
+          echo "Id: $DOMAIN.$PKG  Versión: $VERSION"
+          cat "$PLIST" | head -40
 
       - name: Compilar para el simulador
         working-directory: ios-toolchain
@@ -142,6 +180,11 @@ jobs:
           (cd out && zip -qr "app-kivy-ios-${SLUG}.ipa" Payload)
           SIM=$(find build/xcode-sim/Build/Products -maxdepth 2 -name '*.app' | head -1)
           ditto -c -k --sequesterRsrc --keepParent "$SIM" "out/app-kivy-ios-${SLUG}-simulador.zip"
+
+      # Revisa el paquete (id, arm64, ícono, código dentro de la app...). Si algo está mal, el build
+      # FALLA y no se publica un IPA roto. Lo mismo se puede hacer en tu PC con scripts/check_ipa.py.
+      - name: Revisar el IPA
+        run: python scripts/check_ipa.py "ios-toolchain/out/app-kivy-ios-${SLUG}.ipa"
 
       - name: Subir resultados como artefacto
         uses: actions/upload-artifact@v4

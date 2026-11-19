@@ -267,14 +267,18 @@ Alternativa con cable USB (para quien tenga Android Studio / `adb`): `adb instal
 
 ### Instalar el IPA (iPhone)
 
-El `.ipa` **no está firmado** por Apple, así que hay que firmarlo con tu Apple ID al instalarlo. Se puede hacer
-**desde Windows o Mac, gratis**, con [Sideloadly](https://sideloadly.io):
+El `.ipa` **no está firmado** por Apple, así que hay que firmarlo con tu Apple ID al instalarlo. Todos lo
+instalamos de la misma forma, **desde Windows o Mac y gratis**, con [Sideloadly](https://sideloadly.io):
 
-1. Descarga el `.ipa` de tu rama desde **Releases**.
-2. **Windows:** instala **iTunes** y **iCloud** descargados desde *apple.com* (no los de la Microsoft Store) y
-   después Sideloadly. **Mac:** solo Sideloadly.
+1. Descarga el `.ipa` de tu rama desde **Releases** (`app-kivy-ios-<rama>.ipa`).
+2. Instala lo que Sideloadly necesita:
+   - **Windows:** *primero desinstala* iTunes e iCloud si los tienes de la **Microsoft Store**. Después, desde
+     [sideloadly.io](https://sideloadly.io), pulsa **Download for Windows**: te pedirá antes **Web iTunes 64-bit**
+     y **Web iCloud** (son las versiones *web*, no las de la Microsoft Store); instálalas y luego instala Sideloadly.
+   - **Mac:** solo Sideloadly.
 3. Conecta el iPhone por USB y acepta **«Confiar en este equipo»**.
-4. Abre Sideloadly, arrastra el `.ipa`, escribe tu **Apple ID** y pulsa **Start**.
+4. Abre Sideloadly, arrastra el `.ipa` a la ventana, escribe tu **Apple ID** y pulsa **Start**
+   (si te pide una contraseña de aplicación o un código de verificación, es normal).
 5. En el iPhone: *Ajustes → General → VPN y gestión de dispositivos* → tu Apple ID → **Confiar**.
 6. **iOS 16 o superior:** *Ajustes → Privacidad y seguridad → Modo de desarrollador* → actívalo y reinicia.
 7. Abre **App** desde la pantalla de inicio.
@@ -283,9 +287,10 @@ El `.ipa` **no está firmado** por Apple, así que hay que firmarlo con tu Apple
 Sideloadly) y solo puedes tener unas 3 apps instaladas así a la vez. Con una cuenta de pago de Apple Developer
 (99 USD/año) no caduca tan pronto y se podría firmar directamente en el build (ver `docs/BUILDS.md`).
 
-**Simulador de iPhone (solo si tienes un Mac con Xcode):** descarga `app-kivy-ios-<rama>-simulador.zip`,
-descomprímelo, abre el *Simulador* (Xcode → Open Developer Tool → Simulator) y arrastra el `.app` sobre la
-ventana del simulador, o ejecuta `xcrun simctl install booted <ruta_al_.app>`.
+**¿Se puede revisar el `.ipa` antes de instalarlo?** Sí, en tu PC, sin iPhone:
+`python scripts/check_ipa.py app-kivy-ios-<rama>.ipa` comprueba que el paquete está bien armado (ícono, nombre,
+arm64, tu código dentro...). GitHub además abre la app en un simulador de iPhone en cada build y guarda una
+captura (*Actions → el build de iOS → Artifacts → `captura-ios-<rama>`*).
 
 > ⚠️ Los builds de iOS se compilan en GitHub, pero **solo un iPhone real confirma que todo se ve y funciona
 > igual**. Si notas algo distinto entre PC, Android e iPhone, abre un *Issue* en GitHub y cuéntalo.
