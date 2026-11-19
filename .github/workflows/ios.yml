@@ -48,10 +48,6 @@ jobs:
           slug=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9._-]/-/g')
           echo "SLUG=$slug" >> "$GITHUB_ENV"
 
-      - name: Anotar rama y commit dentro de la app
-        run: |
-          printf 'BRANCH = "%s"\nCOMMIT = "%s"\n' "$GITHUB_REF_NAME" "$GITHUB_SHA" > hub/build_info.py
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"

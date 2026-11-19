@@ -41,10 +41,6 @@ jobs:
           echo "SLUG=$slug" >> "$GITHUB_ENV"
 
       # La app muestra en la portada de qué rama y commit es: así sabes qué versión instalaste.
-      - name: Anotar rama y commit dentro de la app
-        run: |
-          printf 'BRANCH = "%s"\nCOMMIT = "%s"\n' "$GITHUB_REF_NAME" "$GITHUB_SHA" > hub/build_info.py
-
       # Python del RUNNER (para ejecutar buildozer). El Python que se empaqueta en la app
       # (3.11) lo fija p4a.branch en buildozer.spec; son cosas distintas.
       - uses: actions/setup-python@v5

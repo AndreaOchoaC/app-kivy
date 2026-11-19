@@ -69,7 +69,6 @@ versión que está en la rama por defecto, así que el archivo tiene que estar e
 | Paso | Qué hace |
 |---|---|
 | `Calcular nombre de la rama` | Calcula el slug. |
-| `Anotar rama y commit` | Reescribe `hub/build_info.py` (solo en la copia del runner) con la rama y el commit (quedan disponibles para el código en `hub/build_info.py`). |
 | `setup-python 3.11` | Python **del runner**, el que ejecuta buildozer. El Python que se empaqueta dentro de la app es otro (3.11, lo fija `p4a.branch`). |
 | `Instalar dependencias del sistema` | Java 17, compiladores y librerías (`libtool-bin`, `libltdl-dev`...). Sin ellas, compilar `libffi` falla. |
 | `Instalar buildozer` | `buildozer`, `setuptools` y **Cython 0.29.34** (las recetas de python-for-android no soportan Cython 3). |
@@ -185,5 +184,5 @@ Normalmente **no hace falta**: GitHub lo hace por ti. Pero si quieres:
 
 ## 7. Subir la versión de la app
 
-Cuando quieras una versión nueva (por ejemplo `0.2.0`), cámbiala en **dos** lugares: `hub/config.py`
-(`APP_VERSION`) y `buildozer.spec` (`version`). Si olvidas uno, `python dev.py check` te avisa.
+Cuando quieras una versión nueva (por ejemplo `0.2.0`), cámbiala en **un solo lugar**: `version` en
+`buildozer.spec`. Android la usa tal cual, y el build de iOS la copia a su `Info.plist`.

@@ -3,8 +3,6 @@
 import re
 from pathlib import Path
 
-from hub.config import APP_VERSION
-
 ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -33,10 +31,6 @@ def test_buildozer_requirements_match_requirements_txt():
         f"requirements.txt {sorted(pc)} y buildozer.spec {sorted(mobile)} no coinciden. "
         "Agrega la librería en los dos sitios (ver docs/GUIA_ALUMNO.md)."
     )
-
-
-def test_version_matches_buildozer_spec():
-    assert _spec_value("version") == APP_VERSION
 
 
 def test_main_py_is_in_the_root():
