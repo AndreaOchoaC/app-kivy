@@ -132,6 +132,9 @@ jobs:
           VERSION=$(grep -E '^version' ../buildozer.spec | head -1 | cut -d= -f2 | xargs)
           PKG=$(grep -E '^package.name' ../buildozer.spec | head -1 | cut -d= -f2 | xargs)
           DOMAIN=$(grep -E '^package.domain' ../buildozer.spec | head -1 | cut -d= -f2 | xargs)
+          if [ -z "$VERSION" ] || [ -z "$PKG" ] || [ -z "$DOMAIN" ]; then
+            echo "No pude leer version / package.name / package.domain de buildozer.spec"; exit 1
+          fi
           PB=/usr/libexec/PlistBuddy
           $PB -c "Set :CFBundleDisplayName $APP_TITLE" "$PLIST"
           $PB -c "Set :CFBundleIdentifier $DOMAIN.$PKG" "$PLIST"
