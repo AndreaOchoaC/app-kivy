@@ -129,9 +129,9 @@ jobs:
         run: |
           PLIST=$(find . -maxdepth 2 -name '*-Info.plist' | head -1)
           PROJ_DIR=$(dirname "$PLIST")
-          VERSION=$(grep -E '^version' buildozer.spec | head -1 | cut -d= -f2 | xargs)
-          PKG=$(grep -E '^package.name' buildozer.spec | head -1 | cut -d= -f2 | xargs)
-          DOMAIN=$(grep -E '^package.domain' buildozer.spec | head -1 | cut -d= -f2 | xargs)
+          VERSION=$(grep -E '^version' ../buildozer.spec | head -1 | cut -d= -f2 | xargs)
+          PKG=$(grep -E '^package.name' ../buildozer.spec | head -1 | cut -d= -f2 | xargs)
+          DOMAIN=$(grep -E '^package.domain' ../buildozer.spec | head -1 | cut -d= -f2 | xargs)
           PB=/usr/libexec/PlistBuddy
           $PB -c "Set :CFBundleDisplayName $APP_TITLE" "$PLIST"
           $PB -c "Set :CFBundleIdentifier $DOMAIN.$PKG" "$PLIST"
