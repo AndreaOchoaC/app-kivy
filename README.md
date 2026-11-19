@@ -54,10 +54,11 @@ GitHub Actions (builds automáticos), pytest + ruff (calidad).
 
 ### Clonar el repositorio y preparar el entorno
 
-Abre una terminal (en Windows: *PowerShell*) y ejecuta:
+Abre una terminal (en Windows: *PowerShell*) y ejecuta (la URL la copias del botón verde **Code** de la
+página del repositorio en GitHub; tiene la forma `https://github.com/<organización>/app-kivy.git`):
 
 ```bash
-git clone https://github.com/DavidJara14/app-kivy.git
+git clone <URL-del-repositorio>
 cd app-kivy
 ```
 
@@ -189,6 +190,7 @@ app-kivy/
 ├── main.py                  ← punto de entrada (PC, Android e iOS)
 ├── dev.py                   ← comandos: run, panel, new, check...
 ├── setup.bat / setup.sh     ← prepara el entorno después de clonar
+├── scripts/                 ← bootstrap.py (lo usa setup) · check_ipa.py (revisa un .ipa) · make_assets.py (ícono)
 ├── buildozer.spec           ← configuración de Android + lista de librerías de la app
 ├── requirements*.txt        ← librerías (PC) · pyproject.toml / pytest.ini ← herramientas
 ├── assets/                  ← ícono y pantalla de carga de la app

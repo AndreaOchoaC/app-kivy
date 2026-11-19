@@ -52,7 +52,7 @@ El script [`.github/scripts/publish_release.sh`](../.github/scripts/publish_rele
 1. Crea la release `build-<slug>` si no existe (marcada como *pre-release*; la de `main` se llama «Versión principal»).
    Si Android e iOS intentan crearla en el mismo segundo, el segundo simplemente continúa.
 2. **Sube** el archivo (`--clobber`: reemplaza el anterior con el mismo nombre).
-3. **Actualiza las notas** con el commit, el autor y la hora.
+3. **Actualiza las notas** con el commit y la hora (a propósito, sin nombres de personas).
 4. **Mueve la etiqueta** `build-<slug>` al commit compilado.
 
 Resultado: una release **por rama**, siempre con el último build de esa rama. No se acumulan versiones viejas.

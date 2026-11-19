@@ -25,7 +25,6 @@ notes="Última compilación automática de la rama \`${branch}\`.
 | | |
 |---|---|
 | Commit | \`${short_sha}\` |
-| Subido por | ${GITHUB_ACTOR:-desconocido} |
 | Fecha | $(date -u +'%Y-%m-%d %H:%M UTC') |
 
 **Android:** descarga el \`.apk\` en el celular y ábrelo. **iPhone:** descarga el \`.ipa\` y fírmalo con Sideloadly.
