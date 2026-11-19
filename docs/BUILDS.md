@@ -108,7 +108,7 @@ y **no sirve para subirlo a Google Play** (para eso hace falta un build `release
 
 ## 4. iOS (`ios.yml`) paso a paso
 
-Corre en `macos-14` (un Mac virtual con Xcode). **En repositorios públicos es gratis.**
+Corre en `macos-15` (un Mac virtual con Xcode). **En repositorios públicos es gratis.**
 
 | Paso | Qué hace |
 |---|---|
