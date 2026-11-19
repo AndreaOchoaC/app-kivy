@@ -203,6 +203,44 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          bash .github/scripts/publish_release.sh "$SLUG" \
-            "ios-toolchain/out/app-kivy-ios-${SLUG}.ipa" \
-            "ios-toolchain/out/app-kivy-ios-${SLUG}-simulador.zip"
+          bash .github/scripts/publish_release.sh "$SLUG" "ios-toolchain/out/app-kivy-ios-${SLUG}.ipa"
+
+      # PRUEBA DE HUMO: abre la app en un Simulador de iPhone y toma una captura. Va DESPUÉS de
+      # publicar: si falla, el workflow se pone en rojo pero el IPA ya está disponible.
+      - name: Probar la app en el Simulador de iPhone
+        run: |
+          BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$(find ios-toolchain -maxdepth 2 -name '*-Info.plist' | head -1)")
+          UDID=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          for runtime, devs in json.load(sys.stdin)['devices'].items():
+              for d in devs:
+                  if 'iOS' in runtime and d['name'].startswith('iPhone') and 'SE' not in d['name']:
+                      print(d['udid'])
+                      raise SystemExit
+          ")
+          echo "Simulador: $UDID   App: $BUNDLE"
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          rm -rf sim-app && mkdir sim-app
+          ditto -x -k "ios-toolchain/out/app-kivy-ios-${SLUG}-simulador.zip" sim-app
+          xcrun simctl install "$UDID" "$(find sim-app -maxdepth 2 -name '*.app' | head -1)"
+          xcrun simctl launch "$UDID" "$BUNDLE"
+          sleep 25
+          xcrun simctl io "$UDID" screenshot ios-toolchain/out/captura-ios.png
+          # Si la app se cerró sola (error al arrancar), launchctl no le muestra un PID
+          xcrun simctl spawn "$UDID" launchctl list | grep "$BUNDLE" | tee proceso.txt
+          if awk '{print $1}' proceso.txt | grep -qE '^[0-9]+$'; then
+            echo "La app sigue abierta después de 25 s: OK"
+          else
+            echo "La app se cerró sola después de abrirla."
+            exit 1
+          fi
+
+      - name: Subir la captura del Simulador
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: captura-ios-${{ env.SLUG }}
+          path: ios-toolchain/out/captura-ios.png
+          retention-days: 14
+          if-no-files-found: ignore
