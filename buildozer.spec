@@ -9,7 +9,7 @@
 #  coinciden. Las líneas de iOS se leen de aquí también (ver .github/workflows/ios.yml).
 # ============================================================================================
 
-title = TimeClub Studio
+title = App
 package.name = timeclubstudio
 package.domain = org.timeclub
 version = 0.1.0
@@ -40,7 +40,7 @@ android.archs = arm64-v8a
 android.api = 33
 android.ndk = 25b
 android.accept_sdk_license = True
-android.permissions = INTERNET
+android.permissions = INTERNET, VIBRATE
 android.allow_backup = True
 
 [buildozer]

@@ -1,4 +1,4 @@
-# CONTEXTO PARA LA IA — Proyecto «TimeClub Studio» (Kivy)
+# CONTEXTO PARA LA IA — Proyecto «App» (Kivy)
 
 > **Cómo se usa este archivo (para el alumno):**
 > - **IA en el navegador** (ChatGPT, Gemini, Copilot Chat...): copia **TODO** este archivo, pégalo como **primer
@@ -32,8 +32,9 @@ proyecto de equipo hecho con **Python + Kivy**. Reglas de oro:
 
 ## 1. Qué es el proyecto
 
-Una app de celular hecha por un equipo de alumnos. Tiene una **portada profesional** y **un panel por alumno**. Cada
-alumno programa lo que quiere en su panel: un juego, una app útil o varias ventanas. Al final, todos los paneles se
+Una app de celular hecha por un equipo de alumnos. Tiene una **portada sencilla** (el nombre «App» y una tarjeta por panel) y **un panel por alumno**. Cada
+panel **empieza siendo el juego Flappy Bird** (ya terminado, en pantalla completa); el alumno puede modificarlo o
+reemplazarlo por lo que quiera: otro juego, una app útil o varias ventanas. Al final, todos los paneles se
 unen (merge en git) en una sola app. Se ejecuta en **PC** (para probar) y se empaqueta para **Android** (APK) e **iOS** (IPA)
 con **GitHub Actions**, automáticamente en cada `git push` de cada rama.
 
@@ -85,6 +86,7 @@ app-kivy/
 │   └── <nombre_del_alumno>/        ◀━━━━ SOLO AQUÍ SE ESCRIBE ━━━━
 │        ├── __init__.py   datos del panel: PANEL = PanelInfo(...)
 │        ├── panel.py      lógica en Python (una clase que hereda de PanelScreen)
+│        ├── art.py        (Flappy) texturas del juego generadas por código
 │        ├── panel.kv      diseño en KV (reglas <TuClase>:)
 │        └── assets/       imágenes (.png .jpg), sonidos (.wav .ogg .mp3), fuentes (.ttf), datos (.json .txt)
 ├── examples/     juego_estrella, notas, varias_ventanas  (ejemplos de referencia; se pueden copiar a panels/)
@@ -255,6 +257,12 @@ El **estilo** de la app es oscuro, moderno, con esquinas muy redondeadas y espac
 `hub.gfx.gradient(color_a, color_b, "v"|"h"|"d")` → textura de degradado (`texture:` de un Rectangle con `Color: rgba: 1,1,1,1`);
 `hub.gfx.glow()` → luz difuminada; `hub.gfx.shadow()`. No hace falta usarlas.
 
+**`hub/gamekit.py` — herramientas para juegos** (todo se genera por código, sin imágenes ni audios):
+`GameStage` (widget del .kv donde se dibuja a mano con `stage.canvas`; coordenadas locales desde (0, 0); trae `stage.shake` para
+sacudir la pantalla y `stage.fx` para dibujar encima), `vertical_gradient(colores)`, `texture_from_rows(filas, paleta)` (arte de píxeles
+con letras), `ParticleBurst(stage.fx)` (partículas), `play_sound("flap"|"point"|"hit"|"jump"|"coin"|"win"...)` y `vibrate(ms)`.
+**Ejemplo completo: `panels/pilar/` (Flappy Bird).**
+
 ## 7. Reglas para que funcione en el celular (Android e iOS)
 
 1. **Solo Kivy y la biblioteca estándar.** NO uses `tkinter`, `pygame`, `PyQt`, `numpy`, `pandas`, `matplotlib`, `opencv`, `PIL/Pillow`
@@ -319,7 +327,13 @@ class MiJuego(PanelScreen):
             return True
         return False
 ```
-Para pantalla completa pon `header=False` en `PANEL`. **Ejemplo completo y probado: `examples/juego_estrella/`.**
+Para pantalla completa pon `header=False` en `PANEL`. **Ejemplos completos y probados: `examples/juego_estrella/` (juego con widgets)
+y `panels/pilar/` (Flappy Bird, dibujado a mano con `GameStage` de `hub/gamekit.py`).**
+
+> Trampa de Kivy: `self.ids.algo` guarda una referencia **débil**. Si sacas un widget del árbol (`remove_widget`) y quieres volver a
+> ponerlo después, guarda antes `self._w = self.ids.algo.__self__`; si no, Python puede borrarlo.
+> Otra: un widget con `disabled: True` **sigue tragándose los toques** en su zona; para ocultar algo que tape botones, ponle tamaño 0
+> o quítalo del árbol.
 
 ## 9. Receta: varias ventanas dentro del panel
 

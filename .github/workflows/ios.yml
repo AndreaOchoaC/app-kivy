@@ -35,7 +35,7 @@ jobs:
     runs-on: macos-14
     timeout-minutes: 120
     env:
-      APP_TITLE: TimeClubStudio
+      APP_TITLE: App
     steps:
       - uses: actions/checkout@v4
 

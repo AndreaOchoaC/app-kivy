@@ -1,6 +1,5 @@
 """Pruebas del núcleo: portada, navegación, errores y recarga."""
 
-from hub.home import greeting
 from hub.panel import PanelScreen
 from hub.registry import discover
 
@@ -63,10 +62,3 @@ def test_panel_screen_routes_kv_children_into_content(app):
     assert panel.content is not panel
     assert len(panel.content.children) >= 1
 
-
-def test_greeting_changes_with_the_hour():
-    from datetime import datetime
-
-    assert greeting(datetime(2026, 1, 1, 9)) == "Buenos días"
-    assert greeting(datetime(2026, 1, 1, 15)) == "Buenas tardes"
-    assert greeting(datetime(2026, 1, 1, 22)) == "Buenas noches"

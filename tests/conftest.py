@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 
 os.environ["KIVY_NO_ARGS"] = "1"
+os.environ["HUB_NO_SOUND"] = "1"            # sin sonidos durante las pruebas
 os.environ.setdefault("KIVY_NO_CONSOLELOG", "1")
 
 ROOT = Path(__file__).resolve().parent.parent

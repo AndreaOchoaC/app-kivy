@@ -16,6 +16,7 @@ panels/pilar/
 ├── __init__.py    ← los DATOS de tu panel: título, color, autor, descripción
 ├── panel.py       ← el CÓDIGO (Python): qué pasa cuando tocas un botón, la lógica del juego...
 ├── panel.kv       ← el DISEÑO (lenguaje KV): cómo se ve, qué widgets hay y dónde
+├── art.py         ← los dibujos del juego (tubos, suelo, ciudad), hechos con código
 └── assets/        ← tus imágenes y sonidos (créala si no existe)
 ```
 
@@ -170,7 +171,11 @@ def aparecer(self):
 ```
 (No uses el nombre `t` para una de tus propias propiedades: en `Animation`, `t` significa «transición».)
 
-### Hacer un juego
+### Tu panel ya trae un juego: Flappy Bird
+Abre `panel.py` y juega con las constantes de arriba (`GRAVITY`, `FLAP_SPEED`, `GAP_START`, `BIRD_BODY`...): cambian cómo se siente el juego.
+`python dev.py panel pilar` lo abre solo; **F5** recarga después de guardar. Las herramientas para dibujar, partículas y sonidos están en `hub/gamekit.py`.
+
+### Hacer un juego desde cero
 Activa `run_update = True` y mueve cosas en `update(dt)` con `posición += velocidad * dt`.
 **Mira el ejemplo completo en [`examples/juego_estrella/`](../examples/juego_estrella/).**
 ```python

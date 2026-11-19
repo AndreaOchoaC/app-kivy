@@ -1,7 +1,6 @@
 """Constantes generales de la app. No importa Kivy: se puede usar desde cualquier lado."""
 
-APP_NAME = "TimeClub Studio"
-APP_TAGLINE = "Proyecto final de Python: una app, varios paneles, un equipo."
+APP_NAME = "App"
 APP_VERSION = "0.1.0"
 
 # Paquete de Python donde viven los paneles (la carpeta panels/).

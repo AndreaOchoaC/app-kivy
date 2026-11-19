@@ -71,16 +71,7 @@
             padding: max(dp(22), (root.width - dp(640)) / 2), root.inset_top + dp(34), max(dp(22), (root.width - dp(640)) / 2), root.inset_bottom + dp(36)
             spacing: dp(12)
 
-            # ---- Portada -------------------------------------------------------------
-            Chip:
-                text: "PROYECTO FINAL  ·  PYTHON"
-                tint: theme.ACCENT
-            Widget:
-                size_hint_y: None
-                height: dp(6)
-            Caption:
-                text: root.greeting + ", equipo"
-                font_size: "15sp"
+            # ---- Nombre de la app --------------------------------------------------------
             Label:
                 text: root.app_name
                 font_size: "44sp"
@@ -92,50 +83,14 @@
                 halign: "left"
                 valign: "top"
                 shorten: False
-            Body:
-                text: root.tagline
-                font_size: "16sp"
-                color: theme.MUTED
-            BoxLayout:
-                size_hint_y: None
-                height: dp(26)
-                spacing: dp(8)
-                Chip:
-                    text: root.count_text
-                    tint: theme.SUCCESS
-                Chip:
-                    text: "KIVY"
-                    tint: theme.ACCENT_2
-                Widget:
-
             Widget:
                 size_hint_y: None
-                height: dp(18)
+                height: dp(14)
 
             # ---- Paneles ---------------------------------------------------------------
-            Caption:
-                text: "PANELES DEL EQUIPO"
-                bold: True
-                font_size: "12sp"
-                color: theme.FAINT
             GridLayout:
                 id: grid
                 cols: max(1, int(self.width / dp(300)))
                 size_hint_y: None
                 height: self.minimum_height
                 spacing: dp(14)
-
-            # ---- Pie -----------------------------------------------------------------------
-            Widget:
-                size_hint_y: None
-                height: dp(14)
-            Caption:
-                text: root.credits
-                halign: "center"
-                font_size: "13sp"
-                color: theme.MUTED
-            Caption:
-                text: root.version_text
-                halign: "center"
-                font_size: "11sp"
-                color: theme.FAINT

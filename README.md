@@ -1,7 +1,7 @@
-# TimeClub Studio · Proyecto final de Python con Kivy
+# App · Proyecto final de Python con Kivy
 
-Una app de celular hecha **entre todo el equipo**: una portada profesional y **un panel por alumno**.
-Cada alumno programa lo que quiere en su panel (un juego, una app útil, varias ventanas...) y,
+Una app de celular hecha **entre todo el equipo**: una portada sencilla y **un panel por alumno**.
+Cada panel arranca con el juego **Flappy Bird** terminado; cada alumno lo cambia por lo que quiera (otro juego, una app útil, varias ventanas...) y,
 al final, todos los paneles se unen en una sola app que funciona en **Android, iPhone y PC**.
 
 <p align="center">
@@ -199,11 +199,12 @@ app-kivy/
 │   ├── home.py              ·  la portada
 │   ├── widgets.py           ·  Card, PillButton, Avatar, Heading...
 │   ├── theme.py · gfx.py    ·  colores, degradados y sombras
+│   ├── gamekit.py           ·  herramientas para juegos: lienzo, partículas, sonidos, vibración
 │   ├── storage.py           ·  guardado de datos de cada panel
 │   └── kv/                  ·  el diseño (.kv) del núcleo
 ├── panels/                  ← AQUÍ TRABAJAN LOS ALUMNOS
 │   ├── _template/           ·  la plantilla (no se edita)
-│   ├── pilar/               ·  panel.kv · panel.py · __init__.py · assets/
+│   ├── pilar/               ·  panel.kv · panel.py · art.py · __init__.py · assets/  (Flappy Bird)
 │   ├── emiliano/
 │   └── jorge/
 ├── examples/                ← juego, notas y varias ventanas (para copiar)
@@ -245,8 +246,8 @@ y solo se termina el último. Al acabar, los archivos se publican en **Releases*
 
 Cuando borras una rama (después del merge), su release se borra sola (`cleanup.yml`).
 
-> **¿Cómo sé qué versión tengo instalada?** La portada de la app muestra al final `v0.1.0 · <rama> · <commit>`.
-> Compárala con el commit de la release para saber si estás probando tu última versión.
+> **¿Cómo sé qué versión tengo instalada?** Cada release de GitHub dice de qué commit salió y cuándo se publicó.
+> Si el APK/IPA que instalaste es más viejo que tu último `git push`, descarga el nuevo.
 
 La explicación detallada (cada paso de los workflows, cachés, errores comunes, builds firmados) está en
 [`docs/BUILDS.md`](docs/BUILDS.md).
@@ -259,7 +260,7 @@ La explicación detallada (cada paso de los workflows, cachés, errores comunes,
    archivos que uses: actívalo solo para esa app.
 3. Si aparece el aviso de **Play Protect** («app no verificada»), pulsa **«Instalar de todos modos»**.
    Es normal: es una app de desarrollo y no viene de la Play Store.
-4. Abre **TimeClub Studio**. La próxima vez que quieras probar una versión nueva, instala el APK nuevo
+4. Abre **App**. La próxima vez que quieras probar una versión nueva, instala el APK nuevo
    *encima* (se actualiza sin perder tus datos).
 
 Alternativa con cable USB (para quien tenga Android Studio / `adb`): `adb install -r app-kivy-android-<rama>.apk`.
@@ -276,7 +277,7 @@ El `.ipa` **no está firmado** por Apple, así que hay que firmarlo con tu Apple
 4. Abre Sideloadly, arrastra el `.ipa`, escribe tu **Apple ID** y pulsa **Start**.
 5. En el iPhone: *Ajustes → General → VPN y gestión de dispositivos* → tu Apple ID → **Confiar**.
 6. **iOS 16 o superior:** *Ajustes → Privacidad y seguridad → Modo de desarrollador* → actívalo y reinicia.
-7. Abre **TimeClub Studio** desde la pantalla de inicio.
+7. Abre **App** desde la pantalla de inicio.
 
 **Limitaciones del Apple ID gratuito:** la app **caduca a los 7 días** (hay que volver a instalarla con
 Sideloadly) y solo puedes tener unas 3 apps instaladas así a la vez. Con una cuenta de pago de Apple Developer

@@ -50,10 +50,11 @@
         # Panel de inicio / fin (se oculta mientras juegas)
         Card:
             size_hint: None, None
-            size: min(arena.width - dp(48), dp(340)), self.minimum_height
+            # Mientras juegas mide 0 x 0: un widget «disabled» seguiría tragándose los toques
+            # en su zona (y taparía la estrella).
+            size: (0, 0) if root.playing else (min(arena.width - dp(48), dp(340)), self.minimum_height)
             pos_hint: {"center_x": 0.5, "center_y": 0.5}
             opacity: 0 if root.playing else 1
-            disabled: root.playing
             padding: dp(22)
             spacing: dp(12)
             Title:
