@@ -12,7 +12,7 @@ PANEL = PanelInfo(
     # así que NO tienes que cambiarlo.
     id=__name__.rsplit(".", 1)[-1],
     title="Pilar",
-    subtitle="Flappy Bird",
+    subtitle="Cuadrado Saltarin",
     author="Pilar",
     color="#FF5E8A",             # color de tu tarjeta (formato "#RRGGBB")
     screen_class=PilarPanel,     # la clase de panel.py (si le cambias el nombre, cámbialo aquí)
