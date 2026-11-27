@@ -13,9 +13,9 @@ PANEL = PanelInfo(
     # así que NO tienes que cambiarlo.
     id=__name__.rsplit(".", 1)[-1],
     title="Panel de Andrea",
-    subtitle="Aquí vive lo que yo construyo: un juego, una app o varias ventanas.",
+    subtitle="Subtítulo: Mi juego.",
     author="Andrea",
-    color="#34D399",             # color de tu tarjeta (formato "#RRGGBB")
+    color="#3486D3",             # color de tu tarjeta (formato "#RRGGBB")
     screen_class=AndreaPanel,  # la clase de panel.py (si le cambias el nombre, cámbialo aquí)
     # header=False,              # quita la barra superior: pantalla completa (ideal para juegos)
     # order=10,                  # posición en la lista de inicio (menor = antes)
